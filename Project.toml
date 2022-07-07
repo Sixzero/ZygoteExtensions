@@ -1,0 +1,4 @@
+name = "ZygoteExtensions"
+uuid = "5403f96b-0061-4db3-b58b-91317ba4c332"
+authors = ["SixZero <havliktomi@hotmail.com>"]
+version = "0.1.0"
