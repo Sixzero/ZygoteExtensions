@@ -4,4 +4,9 @@ authors = ["SixZero <havliktomi@hotmail.com>"]
 version = "0.1.0"
 
 [deps]
+Boilerplate = "fe7df2fb-dcb5-4bf9-996b-0af1f7856ff2"
+Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
+EllipsisNotation = "da5c29d0-fa7d-589e-88eb-ea29b0a81949"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
