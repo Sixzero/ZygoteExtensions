@@ -135,8 +135,20 @@ Zygote.@adjoint function Boilerplate.sizes(x,)
   sizes(x), dy -> ((nothing))
 end
 
-stack1(l) = begin
-  data = zeros(eltype(l[1]), length(l), size(l[1])...)
+stack1(l, strict=true) = begin
+  local max_size
+  if strict
+    last_s = size(l[1])
+    for (i,l_i) in enumerate(l[2:end])
+      @assert all(size(l_i) .=== last_s) "All sizes needs to be the same. size($(i-1))!=size($i) $(last_s) and $(size(l_i))"
+    end
+  else
+    max_size = [size(l[1])...]
+    for (i,l_i) in enumerate(l[2:end])
+      max_size = [size(l_i,j) > max_size[j] ? size(l_i,j) : max_size[j] for j in 1:ndims(l_i)]
+    end
+  end
+  data = zeros(eltype(l[1]), length(l), max_size...)
   @inbounds for (i, d) in enumerate(l)
     # data[i, :] .= d
     # @. data[i, :] = d
