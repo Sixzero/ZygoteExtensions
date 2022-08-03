@@ -1,7 +1,7 @@
 module ZygoteExtensions
 
 using Zygote
-using Flux
+import Flux
 using InteractiveUtils
 using Distributed
 using Boilerplate: sizes, @sizes, @typeof, map_array
@@ -14,8 +14,19 @@ function mean_nonzero(x; dims)
   nonzero_count = Zygote.@ignore (sum(x .!= 0, dims=dims) .+ 1f-4)
   sum(x, dims=dims) ./ nonzero_count
 end
-
-softmax_dim(dims) = arr -> softmax(arr; dims)
+function softmax!(out::AbstractArray{T}, x::AbstractArray; dims = 1) where {T}
+  max_ = maximum(x; dims)
+  # max_ = 0
+  if all(isfinite, max_)
+      # @fastmath out .= exp.(x .- max_)
+      @fastmath out .= exp.(x)
+  else
+      @fastmath @. out = ifelse(isequal(max_,Inf), ifelse(isequal(x,Inf), 1, 0), exp(x - max_))
+  end
+  out ./= sum(out; dims)
+end
+softmax(x; dims = 1) = softmax!(zero(x), x; dims)
+@inline softmax_dim(dims) = arr -> softmax(arr; dims)
 function onehot(y::AbstractArray, classes)
   @assert size(y, 1) > 2 "Batch dimensions should be larger. why?: $(sizes(y)) and why?: $(sizes(classes))"
   classes = collect(classes)
@@ -142,6 +153,7 @@ stack1(l, strict=true) = begin
     for (i,l_i) in enumerate(l[2:end])
       @assert all(size(l_i) .=== last_s) "All sizes needs to be the same. size($(i-1))!=size($i) $(last_s) and $(size(l_i))"
     end
+    max_size = [size(l[1])...]
   else
     max_size = [size(l[1])...]
     for (i,l_i) in enumerate(l[2:end])
