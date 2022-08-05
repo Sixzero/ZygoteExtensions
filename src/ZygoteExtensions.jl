@@ -14,18 +14,19 @@ function mean_nonzero(x; dims)
   nonzero_count = Zygote.@ignore (sum(x .!= 0, dims=dims) .+ 1f-4)
   sum(x, dims=dims) ./ nonzero_count
 end
-function softmax!(out::AbstractArray{T}, x::AbstractArray; dims = 1) where {T}
-  max_ = maximum(x; dims)
-  # max_ = 0
-  if all(isfinite, max_)
-      # @fastmath out .= exp.(x .- max_)
-      @fastmath out .= exp.(x)
-  else
-      @fastmath @. out = ifelse(isequal(max_,Inf), ifelse(isequal(x,Inf), 1, 0), exp(x - max_))
-  end
-  out ./= sum(out; dims)
-end
-softmax(x; dims = 1) = softmax!(zero(x), x; dims)
+# function softmax!(out::AbstractArray{T}, x::AbstractArray; dims = 1) where {T}
+#   max_ = maximum(x; dims)
+#   # max_ = 0
+#   if all(isfinite, max_)
+#       # @fastmath out .= exp.(x .- max_)
+#       @fastmath out .= exp.(x)
+#   else
+#       @fastmath @. out = ifelse(isequal(max_,Inf), ifelse(isequal(x,Inf), 1, 0), exp(x - max_))
+#   end
+#   out ./= sum(out; dims)
+# end
+# softmax(x; dims = 1) = softmax!(zero(x), x; dims)
+softmax(x; dims) = Flux.softmax(x; dims)
 @inline softmax_dim(dims) = arr -> softmax(arr; dims)
 function onehot(y::AbstractArray, classes)
   @assert size(y, 1) > 2 "Batch dimensions should be larger. why?: $(sizes(y)) and why?: $(sizes(classes))"
