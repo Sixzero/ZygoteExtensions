@@ -26,6 +26,7 @@ end
 #   out ./= sum(out; dims)
 # end
 # softmax(x; dims = 1) = softmax!(zero(x), x; dims)
+softmax(x::Vector; dims) = Flux.softmax.(x; dims)
 softmax(x; dims) = Flux.softmax(x; dims)
 @inline softmax_dim(dims) = arr -> softmax(arr; dims)
 function onehot(y::AbstractArray, classes)
