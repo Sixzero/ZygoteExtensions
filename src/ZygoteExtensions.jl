@@ -5,6 +5,7 @@ import Flux
 using InteractiveUtils
 using Distributed
 using Boilerplate: sizes, @sizes, @typeof, map_array
+using ToggleableAsserts
 
 greet() = print("Hello World!")
 vnorm(v::AbstractVector{<:Real}) = (v ./ sum(v))
@@ -148,25 +149,48 @@ Zygote.@adjoint function Boilerplate.sizes(x,)
   sizes(x), dy -> ((nothing))
 end
 
-stack1(l, strict=true) = begin
-  local max_size
-  if strict
-    last_s = size(l[1])
+function gradient_pro(f, args...)
+  y, back = Zygote.pullback(f, args...)
+  return y, back(one(y))
+end
+struct S{T} end
+get_max_size(l::Vector) = get_max_size(l, Val(true))
+get_max_size(l::Vector, strict::Val{true}) = begin
+  @toggled_assert let 
+    is_valid = true
     for (i,l_i) in enumerate(l[2:end])
-      @assert all(size(l_i) .=== last_s) "All sizes needs to be the same. size($(i-1))!=size($i) $(last_s) and $(size(l_i))"
+      is_valid &= all(size(l_i) .=== size(l[1]))
     end
-    max_size = [size(l[1])...]
-  else
-    max_size = [size(l[1])...]
-    for (i,l_i) in enumerate(l[2:end])
-      max_size = [size(l_i,j) > max_size[j] ? size(l_i,j) : max_size[j] for j in 1:ndims(l_i)]
+    is_valid
+  end "All sizes needs to be the same. size($(i-1))!=size($i) $(last_s) and $(size(l_i))"
+  size(l[1])
+end
+get_max_size(l::Vector, strict::Val{false}) = begin
+  max_size = size(l[1])
+  for (i,l_i) in enumerate(l[2:end])
+    max_size = (size(l_i,j) > max_size[j] ? size(l_i,j) : max_size[j] for j in 1:ndims(l_i))
+  end
+  max_size
+end
+# vcat_nospread(l::Vector{Array{Float32,N}}; strict=Val(1)) = 
+vcat_nospread(l::Vector{Array{Float32,N}}, strict::Val=Val(true)) where {N} = begin
+  max_size::NTuple{N,Int64} = get_max_size(l, strict)
+
+  data::Array{Float32, N} = zeros(eltype(l[1]), length(l)*max_size[1], max_size[2:end]...)
+  @inbounds for (i, d) in enumerate(l)
+    s1 = size(d,1)
+    for j in 0:div(length(d),s1)-1
+      for k in 1:s1
+        data[(i-1)*s1 + j*s1*length(l) + k] = d[j*s1+k]
+      end
     end
   end
-  data = zeros(eltype(l[1]), length(l), max_size...)
+  data
+end
+stack1(l::Vector{Array{Float32,N}}, strict::Val=Val(true)) where {N} = begin
+  max_size::NTuple{N,Int64} = get_max_size(l, strict)
+  data::Array{Float32, N+1} = zeros(eltype(l[1]), length(l), max_size...)
   @inbounds for (i, d) in enumerate(l)
-    # data[i, :] .= d
-    # @. data[i, :] = d
-    # @.. data[i, :] = d
     for j in eachindex(d)
       data[i + (j-1)*length(l)] = d[j]
     end
