@@ -162,7 +162,7 @@ get_max_size(l::Vector, strict::Val{true}) = begin
       is_valid &= all(size(l_i) .=== size(l[1]))
     end
     is_valid
-  end "All sizes needs to be the same. size($(i-1))!=size($i) $(last_s) and $(size(l_i))"
+  end "All sizes needs to be the same." # size($(i-1))!=size($i) $(last_s) and $(size(l_i))" # TODO Tomi these aren't existing variables in this scope... what did we want to do with there?
   size(l[1])
 end
 get_max_size(l::Vector, strict::Val{false}) = begin
@@ -176,7 +176,7 @@ end
 vcat_nospread(l::Vector{Array{Float32,N}}, strict::Val=Val(true)) where {N} = begin
   max_size::NTuple{N,Int64} = get_max_size(l, strict)
 
-  data::Array{Float32, N} = zeros(eltype(l[1]), length(l)*max_size[1], max_size[2:end]...)
+  data::Array{Float32, N} = zeros(Float32, length(l)*max_size[1], max_size[2:end]...)
   @inbounds for (i, d) in enumerate(l)
     s1 = size(d,1)
     for j in 0:div(length(d),s1)-1
@@ -189,7 +189,7 @@ vcat_nospread(l::Vector{Array{Float32,N}}, strict::Val=Val(true)) where {N} = be
 end
 stack1(l::Vector{Array{Float32,N}}, strict::Val=Val(true)) where {N} = begin
   max_size::NTuple{N,Int64} = get_max_size(l, strict)
-  data::Array{Float32, N+1} = zeros(eltype(l[1]), length(l), max_size...)
+  data::Array{Float32, N+1} = zeros(Float32, length(l), max_size...)
   @inbounds for (i, d) in enumerate(l)
     for j in eachindex(d)
       data[i + (j-1)*length(l)] = d[j]
@@ -198,7 +198,7 @@ stack1(l::Vector{Array{Float32,N}}, strict::Val=Val(true)) where {N} = begin
   data
 end
 Zygote.@adjoint function stack1(l)
-  data = zeros(eltype(l[1]), length(l), size(l[1])...)
+  data = zeros(Float32, length(l), size(l[1])...)
   @inbounds for (i, d) in enumerate(l)
     for j in eachindex(d)
       data[i + (j-1)*length(l)] = d[j]
