@@ -187,9 +187,9 @@ vcat_nospread(l::Vector{Array{Float32,N}}, strict::Val=Val(true)) where {N} = be
   end
   data
 end
-stack1(l::Vector{Array{Float32,N}}, strict::Val=Val(true)) where {N} = begin
+stack1(l::Vector{Array{T,N}}, strict::Val=Val(true)) where {N, T} = begin
   max_size::NTuple{N,Int64} = get_max_size(l, strict)
-  data::Array{Float32, N+1} = zeros(Float32, length(l), max_size...)
+  data::Array{T, N+1} = zeros(T, length(l), max_size...)
   @inbounds for (i, d) in enumerate(l)
     for j in eachindex(d)
       data[i + (j-1)*length(l)] = d[j]
