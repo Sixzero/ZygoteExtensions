@@ -1,13 +1,14 @@
 module ZygoteExtensions
 
 using Zygote
-import Flux
+using Flux
 using InteractiveUtils
 using Distributed
 using Boilerplate: sizes, @sizes, @typeof, map_array
 using ToggleableAsserts
+using Boilerplate
 
-greet() = print("Hello World!")
+
 vnorm(v::AbstractVector{<:Real}) = (v ./ sum(v))
 antizero(arr) = (arr.+=abs.(arr); arr./=2)
 
@@ -144,7 +145,6 @@ observe(x, msg = "") = x
 Zygote.@adjoint function observe(x, msg = nothing)
   x, dy -> (println(msg !== nothing ? "$msg " : "", "$(typeof(dy)) $dy", x); (dy, nothing))
 end
-import Boilerplate
 Zygote.@adjoint function Boilerplate.sizes(x,)
   sizes(x), dy -> ((nothing))
 end
