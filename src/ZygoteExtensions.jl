@@ -6,7 +6,7 @@ using InteractiveUtils
 using Distributed
 using Boilerplate: sizes, @sizes, @typeof, map_array
 using ToggleableAsserts
-using Boilerplate
+using BoilerplateCvikli
 
 
 vnorm(v::AbstractVector{<:Real}) = (v ./ sum(v))
