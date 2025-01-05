@@ -4,9 +4,9 @@ using Zygote
 using Flux
 using InteractiveUtils
 using Distributed
-# using Boilerplate: sizes, @sizes, @typeof, map_array
 using ToggleableAsserts
 using BoilerplateCvikli
+using BoilerplateCvikli: sizes, @sizes, @typeof, map_array
 
 
 vnorm(v::AbstractVector{<:Real}) = (v ./ sum(v))
@@ -145,7 +145,7 @@ observe(x, msg = "") = x
 Zygote.@adjoint function observe(x, msg = nothing)
   x, dy -> (println(msg !== nothing ? "$msg " : "", "$(typeof(dy)) $dy", x); (dy, nothing))
 end
-Zygote.@adjoint function Boilerplate.sizes(x,)
+Zygote.@adjoint function BoilerplateCvikli.sizes(x,)
   sizes(x), dy -> ((nothing))
 end
 

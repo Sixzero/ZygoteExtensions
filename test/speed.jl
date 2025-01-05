@@ -1,7 +1,7 @@
 
 using BenchmarkTools
 BenchmarkTools.DEFAULT_PARAMETERS.seconds = 0.10
-using Boilerplate
+using BoilerplateCvikli
 using ZygoteExtensions: vcat_nospread, stack1
 inner = reshape(collect(1f0:660f0),3,1,:)
 a = [inner.+i*10 for i in 1:2000]
@@ -24,7 +24,7 @@ a = [inner.+i*10 for i in 1:2000]
 #%%
 using BenchmarkTools
 BenchmarkTools.DEFAULT_PARAMETERS.seconds = 0.10
-using Boilerplate
+using BoilerplateCvikli
 using ZygoteExtensions: get_max_size
 using ToggleableAsserts
 toggle(false)
