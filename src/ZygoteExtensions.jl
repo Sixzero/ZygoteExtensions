@@ -4,7 +4,7 @@ using Zygote
 using Flux
 using InteractiveUtils
 using Distributed
-using Boilerplate: sizes, @sizes, @typeof, map_array
+# using Boilerplate: sizes, @sizes, @typeof, map_array
 using ToggleableAsserts
 using BoilerplateCvikli
 

@@ -4,9 +4,17 @@ authors = ["SixZero <havliktomi@hotmail.com>"]
 version = "0.1.0"
 
 [deps]
+BoilerplateCvikli = "9c9f911a-9395-49bd-b3fc-139ceb24aa85"
 Distributed = "8ba89e20-285c-5b6f-9357-94700520ee1b"
-EllipsisNotation = "da5c29d0-fa7d-589e-88eb-ea29b0a81949"
 Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 ToggleableAsserts = "07ecc579-1b30-493c-b961-3180daf6e3ae"
 Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+
+[compat]
+BoilerplateCvikli = "1.1"
+Distributed = "1.11"
+Flux = "0.16"
+InteractiveUtils = "1.11"
+ToggleableAsserts = "0.1"
+Zygote = "0.6"
